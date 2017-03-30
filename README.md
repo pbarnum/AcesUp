@@ -1,3 +1,3 @@
 # AcesUp
 
-A solitaire game played in Terminal
+A solitaire game for the terminal
