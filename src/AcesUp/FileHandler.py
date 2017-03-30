@@ -8,7 +8,7 @@ import os.path
 
 class FileHandler:
     def __init__(self):
-        self.__fileName = os.path.expanduser('~') + '.acesup'
+        self.__fileName = os.path.expanduser('~') + '/.acesup'
         self.__createFile()
         self.__readFile()
 
