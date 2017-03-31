@@ -21,6 +21,8 @@ class Game:
 
         self.loadPlayer(playerName)
 
+        self.__status = self.IN_MENU
+
         # Points
         self.__modCounter = 0;
         self.__modifier = 0;

@@ -10,14 +10,19 @@ class AcesUp:
 
     def main(self, argc, argv):
         while self.menu.hasMenu():
-            parameters = []
-            if self.menu.getCurrentMenu() == Menu.MAIN:
-                parameters = self.game.getPlayer().getName()
+            try:
+                parameters = []
+                if self.menu.getCurrentMenu() == Menu.MAIN:
+                    parameters = self.game.getPlayer().getName()
 
-            self.menu.printMenu(parameters)
+                self.menu.printMenu(parameters)
 
-            if (self.menu.getCurrentMenu() == Menu.GAME):
-                self.__loopGame()
+                if (self.menu.getCurrentMenu() == Menu.GAME):
+                    self.__loopGame()
+            except KeyboardInterrupt:
+                if self.game.isInGame():
+                    self.game.finishGame()
+                break
 
         return 0
 
@@ -27,7 +32,7 @@ class AcesUp:
             self.game.printCards()
             action = self.menu.printMenu(self.game.getCurrentFacingCards())
 
-            isInt = True
+            # Convert to int if possible
             try:
                 action = int(action)
             except ValueError:
