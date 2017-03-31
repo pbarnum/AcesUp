@@ -39,14 +39,26 @@ class FileHandler:
         return self.__loadPlayerFromFile(playerName)
 
     def savePlayer(self, player):
-        stats = []
-        stats['score'] = player.getScore()
-        stats['time'] = player.getTime()
+        stats = {
+            'name': player.getName(),
+            'score': player.getScore(),
+            'time': player.getTime(),
+            'gamesWon': player.getGamesWon(),
+            'gamesLost': player.getGamesLost(),
+            'statResets': player.getStatResets()
+        }
 
-        self.__getPlayers()[player.getName()] = stats
+        self.__setPlayer(stats)
 
         with open(self.__fileName, 'w') as outfile:
-            json.dump(self.__file, outfile)
+            json.dump(str(self.__file), outfile)
+
+    def __setPlayer(self, stats):
+        for index in range(0, len(self.__getPlayers())):
+            if self.__getPlayers()[index]['name'] == stats['name']:
+                self.__getPlayers()[index] = stats
+                return
+        return self.__getPlayers().append(stats)
 
     def __getPlayerAttribute(self, attr):
         # TODO: get player name with attribute
