@@ -200,7 +200,7 @@ class Game:
             self.addRemovedCardPoints()
 
     def __canRemoveCardFromPile(self, index):
-        if index in range(0, 3):
+        if index in range(0, 4):
             cardInQuestion = self.__discardPiles[index].getFacingCard()
             if cardInQuestion is not None:
                 for pile in self.__discardPiles:
