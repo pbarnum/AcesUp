@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+sys.path.append('./src/AcesUp')
 from AcesUp import AcesUp
 
 game = AcesUp()
