@@ -98,7 +98,6 @@ class Game:
     def finishGame(self):
         self.__setGameStatus(Game.FINISHED)
         self.savePlayer(self.__player)
-        self.__setGameStatus(Game.IN_MENU)
 
     def quitGame(self):
         # TODO: mark game as failure
@@ -195,20 +194,34 @@ class Game:
     ##
     # Removes a Card from its pile
     ##
-    def removeCard(self, index):
+    def rmCard(self, index):
         if self.__canRemoveCardFromPile(index):
             self.incrementModCounter()
             self.__discardPiles[index].popCard()
             self.addRemovedCardPoints()
 
+    def mvCard(self, index):
+        if index in range(0, len(self.__discardPiles)):
+            cardInQuestion = self.__discardPiles[index].getFacingCard()
+            if cardInQuestion is not None:
+                for pile in self.__discardPiles:
+                    if pile.getFacingCard() is None:
+                        self.__discardPiles[index].popCard()
+                        pile.pushCard(cardInQuestion)
+                        return True
+            print(str(cardInQuestion) + ' cannot be moved')
+        print('Invalid column selected')
+
+
     def __canRemoveCardFromPile(self, index):
-        if index in range(0, 4):
+        if index in range(0, len(self.__discardPiles)):
             cardInQuestion = self.__discardPiles[index].getFacingCard()
             if cardInQuestion is not None:
                 for pile in self.__discardPiles:
                     if pile.dominatesCard(cardInQuestion):
                         return True
-
+            print(str(cardInQuestion) + ' cannot be removed')
+        print('Invalid column selected')
         return False
 
     ##
@@ -228,7 +241,7 @@ class Game:
     ##
     # Resets the mod counter back to default (0)
     ##
-    def resetModCounter(self):
+    def __resetModCounter(self):
         self.__modCounter = 0
 
     ##

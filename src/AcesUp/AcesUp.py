@@ -30,22 +30,26 @@ class AcesUp:
         self.game.startGame()
         while self.game.isInGame():
             self.game.printCards()
-            action = self.menu.printMenu(self.game.getCurrentFacingCards())
+            uInput = str(self.menu.printMenu(self.game.getCurrentFacingCards())).strip()
 
-            # Convert to int if possible
-            try:
-                action = int(action)
-            except ValueError:
-                pass
+            action = uInput[:2]
+            if action == 'mv' or action == 'rm':
+                try:
+                    column = int(uInput[-1:])
+                except ValueError:
+                    print('Column must be an integer')
+                    continue
 
-            if action in range(1, 5):
-                self.game.removeCard(int(action) - 1)
+                # Call the proper function to handle the action
+                getattr(self.game, action + 'Card')(column - 1)
             elif action == 'd':
                 self.game.deal()
-                continue
             elif action == 'q':
                 self.game.quitGame()
                 self.menu.setCurrentMenu(Menu.MAIN)
+
+        # Return to the main menu
+        self.menu.setCurrentMenu(Menu.MAIN)
 
 
 # TODO: write method to check if game was beatable (and how many different ways)
