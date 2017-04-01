@@ -47,3 +47,13 @@ class Player:
 
     def addStatReset(self):
         ++self.__statResets
+
+    def getAllStats(self):
+        return {
+            'name': self.getName(),
+            'score': self.getScore(),
+            'time': self.getTime(),
+            'gamesWon': self.getGamesWon(),
+            'gamesLost': self.getGamesLost(),
+            'statResets': self.getStatResets()
+        }

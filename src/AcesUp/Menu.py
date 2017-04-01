@@ -67,13 +67,13 @@ class Menu:
         print('Actions:')
 
         if card1 is not None:
-            print('[1] Remove ' + str(card1))
+            print('[mv|rm 1] ' + str(card1))
         if card2 is not None:
-            print('[2] Remove ' + str(card2))
+            print('[mv|rm 2] ' + str(card2))
         if card3 is not None:
-            print('[3] Remove ' + str(card3))
+            print('[mv|rm 3] ' + str(card3))
         if card4 is not None:
-            print('[4] Remove ' + str(card4))
+            print('[mv|rm 4] ' + str(card4))
 
         print('[D]eal again')
         print('[Q]uit game')
