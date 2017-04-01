@@ -5,8 +5,11 @@
 
 import json
 import os.path
+from Player import Player
 
 class FileHandler:
+    DEFAULT_PLAYER = 'Player 1'
+
     def __init__(self):
         self.__fileName = os.path.expanduser('~') + '/.acesup'
         self.__createFile()
@@ -14,8 +17,8 @@ class FileHandler:
 
     def __createFile(self):
         if not os.path.isfile(self.__fileName):
-            with open(self.__fileName, 'w') as outfile:
-                json.dump('{"version":"v1.0.0","players":[{"name":"Player 1","score":0,"time":0,"gamesWon":0,"gamesLost":0,"statResets":0}],"lastPlayer":"Player 1"}', outfile)
+            self.__file = self.__generateData()
+            self.savePlayer(Player(self.DEFAULT_PLAYER))
 
     def __readFile(self):
         file = ''
@@ -23,42 +26,33 @@ class FileHandler:
             file = json.load(jsonData)
         self.__file = json.loads(file)
 
+    def __generateData(self):
+        return {
+            'version': 'v1.0.0',
+            'players': [],
+        }
+
     def __loadPlayerFromFile(self, playerName):
         for player in self.__getPlayers():
             if player['name'] == playerName:
                 return player
         return None
 
+    def __getPlayerCount(self):
+        return len(self.__getPlayers())
+
     def __getPlayers(self):
-        return self.__file['players'] if len(self.__file['players']) else []
+        if self.__file['players'] is None or type(self.__file['players']) is not list:
+            self.__file['players'] = []
+        return self.__file['players']
 
-    def getLatestPlayerByName(self):
-        return self.__file['lastPlayer']
+    def __setPlayer(self, playerStats):
+        self.__file.update({'lastPlayer': playerStats['name']})
+        for index in range(0, self.__getPlayerCount()):
+            if self.__getPlayers()[index]['name'] == playerStats['name']:
+                return self.__getPlayers()[index].update(playerStats)
 
-    def loadPlayerByName(self, playerName):
-        return self.__loadPlayerFromFile(playerName)
-
-    def savePlayer(self, player):
-        stats = {
-            'name': player.getName(),
-            'score': player.getScore(),
-            'time': player.getTime(),
-            'gamesWon': player.getGamesWon(),
-            'gamesLost': player.getGamesLost(),
-            'statResets': player.getStatResets()
-        }
-
-        self.__setPlayer(stats)
-
-        with open(self.__fileName, 'w') as outfile:
-            json.dump(str(self.__file), outfile)
-
-    def __setPlayer(self, stats):
-        for index in range(0, len(self.__getPlayers())):
-            if self.__getPlayers()[index]['name'] == stats['name']:
-                self.__getPlayers()[index] = stats
-                return
-        return self.__getPlayers().append(stats)
+        return self.__getPlayers().append(playerStats)
 
     def __getPlayerAttribute(self, attr):
         # TODO: get player name with attribute
@@ -67,6 +61,19 @@ class FileHandler:
             value = player[attr] if len(player[attr]) else 0
             values.append(value)
         return values
+
+    def getLatestPlayerByName(self):
+        return self.__file['lastPlayer']
+
+    def loadPlayerByName(self, playerName):
+        return self.__loadPlayerFromFile(playerName)
+
+    def savePlayer(self, player):
+        self.__setPlayer(player.getAllStats())
+
+        # Write to the file
+        with open(self.__fileName, 'w') as outfile:
+            json.dump(json.dumps(self.__file), outfile)
 
     def getScores(self):
         return self.__getPlayerAttribute('score')
