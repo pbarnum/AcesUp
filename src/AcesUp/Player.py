@@ -3,7 +3,10 @@
 # Written by Patrick Barnum
 ##
 
+
 class Player:
+    DEFAULT_PLAYER = 'Player 1'
+
     def __init__(self, name):
         self.__name = name
         self.__score = 0

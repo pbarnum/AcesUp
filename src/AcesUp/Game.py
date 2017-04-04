@@ -7,6 +7,7 @@ from Deck import Deck
 from FileHandler import FileHandler
 from Player import Player
 
+
 class Game:
     PAUSED = 0
     IN_GAME = 1
@@ -24,8 +25,8 @@ class Game:
         self.__status = self.IN_MENU
 
         # Points
-        self.__modCounter = 0;
-        self.__modifier = 0;
+        self.__modCounter = 0
+        self.__modifier = 0
         self.__resetPointModifier()
         self.__initializeDeck()
 
@@ -58,7 +59,7 @@ class Game:
     def __getLastPlayer(self):
         name = self.__file.getLatestPlayerByName()
         if name is None:
-            return 'Player 1'
+            return Player.DEFAULT_PLAYER
         return name
 
     def getPlayer(self):
@@ -127,7 +128,7 @@ class Game:
     ##
     def getTopScores(self):
         scores = self.__file.getScores()
-        scores.sort(reverse = True)
+        scores.sort(reverse=True)
         return scores[0, 10]
 
     ##
@@ -135,7 +136,7 @@ class Game:
     ##
     def getTopTimes(self):
         times = self.__file.getTimes()
-        times.sort(reverse = True)
+        times.sort(reverse=True)
         return times[0, 10]
 
     ##
@@ -160,6 +161,8 @@ class Game:
         return cards
 
     def printCards(self):
+        gameTitle = 'Aces Up!\n' + self.getPlayer().getName() + '\n'
+        output = ''
         found = True
         num = 0
         while found:
@@ -174,7 +177,8 @@ class Game:
                 else:
                     row += '   '
             num += 1
-            print(row)
+            output += '\n' + row
+        return gameTitle + output
 
     ##
     # Deals four Cards from the deck
@@ -212,10 +216,10 @@ class Game:
             print(str(cardInQuestion) + ' cannot be moved')
         print('Invalid column selected')
 
-
     def __canRemoveCardFromPile(self, index):
         if index in range(0, len(self.__discardPiles)):
             cardInQuestion = self.__discardPiles[index].getFacingCard()
+            print('card in question: ' + str(cardInQuestion))
             if cardInQuestion is not None:
                 for pile in self.__discardPiles:
                     if pile.dominatesCard(cardInQuestion):
@@ -238,6 +242,7 @@ class Game:
     ##
     def incrementModCounter(self):
         self.__modCounter += 1
+
     ##
     # Resets the mod counter back to default (0)
     ##
