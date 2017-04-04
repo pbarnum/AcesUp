@@ -1,6 +1,6 @@
-from __future__ import print_function
 from Game import Game
 from Menu import Menu
+
 
 class AcesUp:
     def __init__(self):
@@ -29,7 +29,7 @@ class AcesUp:
     def __loopGame(self):
         self.game.startGame()
         while self.game.isInGame():
-            self.game.printCards()
+            self.menu.printTitle(self.game.printCards())
             uInput = str(self.menu.printMenu(self.game.getCurrentFacingCards())).strip()
 
             action = uInput[:2]
@@ -50,7 +50,3 @@ class AcesUp:
 
         # Return to the main menu
         self.menu.setCurrentMenu(Menu.MAIN)
-
-
-# TODO: write method to check if game was beatable (and how many different ways)
-# TODO: record all games played?

@@ -7,6 +7,7 @@ import random
 from Card import Card
 from Suits import Suits
 
+
 class Deck:
     DECK_MAX = 52
     SUIT_MAX = 13
@@ -22,7 +23,7 @@ class Deck:
                 self.pushCard(card)
 
     def cardsRemaining(self):
-        return len(self.__cards);
+        return len(self.__cards)
 
     def getCardAt(self, position):
         # Return the dereferenced pointer if position is in the vector's bounds

@@ -5,11 +5,11 @@
 
 import json
 import os.path
+from version import __version__
 from Player import Player
 
-class FileHandler:
-    DEFAULT_PLAYER = 'Player 1'
 
+class FileHandler:
     def __init__(self):
         self.__fileName = os.path.expanduser('~') + '/.acesup'
         self.__createFile()
@@ -18,7 +18,7 @@ class FileHandler:
     def __createFile(self):
         if not os.path.isfile(self.__fileName):
             self.__file = self.__generateData()
-            self.savePlayer(Player(self.DEFAULT_PLAYER))
+            self.savePlayer(Player(Player.DEFAULT_PLAYER))
 
     def __readFile(self):
         file = ''
@@ -28,7 +28,7 @@ class FileHandler:
 
     def __generateData(self):
         return {
-            'version': 'v1.0.0',
+            'version': __version__,
             'players': [],
         }
 
