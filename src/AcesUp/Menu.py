@@ -16,7 +16,8 @@ class Menu:
 
     def __init__(self):
         self.__width = 58
-        self.__padding = 10
+        self.__padding = 5
+        self.__colPadding = 2
         self.__border = '+'
         for i in range(0, self.__width):
             self.__border = self.__border + '-'
@@ -33,7 +34,7 @@ class Menu:
 
     def printMenu(self, *args):
         if len(args[0]) > 0:
-            return getattr(self, self.getCurrentMenu() + 'Menu')(args)
+            return getattr(self, self.getCurrentMenu() + 'Menu')(args[0])
         else:
             return getattr(self, self.getCurrentMenu() + 'Menu')()
 
@@ -84,7 +85,7 @@ class Menu:
             return [title]
 
     def __addPadding(self, string):
-        string = (' ' * (self.__padding / 2)) + string + (' ' * (self.__padding / 2))
+        string = (' ' * self.__padding) + string + (' ' * self.__padding)
         addToEnd = True
         while len(string) < (self.__width):
             if addToEnd is True:
@@ -105,11 +106,47 @@ class Menu:
             print('|' + self.__addPadding(string) + '|')
         print(self.__border + '\n')
 
+    def __formatTable(self, table):
+        formatted = {
+            'table': table,
+            'colWidth': [0] * len(table[0])
+        }
+
+        for row in range(0, len(table)):
+            for col in range(0, len(table[row])):
+                if formatted['colWidth'][col] < len(str(table[row][col])):
+                    formatted['colWidth'][col] = len(str(table[row][col]))
+
+        return formatted
+
+    def __printTable(self, table):
+        # Number of columns * padding on both sides + number of dividers
+        totalPadding = len(table['colWidth']) * (self.__colPadding * 2)
+        sumOfColValues = sum(table['colWidth'])
+        numberOfDividers = len(table['colWidth']) - 1
+        tableWidth = totalPadding + sumOfColValues + numberOfDividers
+        border = '+' + ('-' * tableWidth) + '+'
+        padding = ' ' * self.__colPadding
+
+        print(border)
+        for row in range(0, len(table['table'])):
+            string = '|'
+            for col in range(0, len(table['table'][row])):
+                value = str(table['table'][row][col])
+                multiply = table['colWidth'][col] - len(str(table['table'][row][col]))
+                spaces = ' ' * multiply
+                string += padding + value + spaces + padding + '|'
+            print(string)
+            print(border)
+
+        # Print new line
+        print('')
+
     ##
     #
     ##
     def mainMenu(self, args):
-        playerName = args[0]
+        playerName = args
 
         self.printTitle('Welcome to AcesUp\nWritten by Patrick Barnum\nBuild ' + __version__)
 
@@ -118,7 +155,7 @@ class Menu:
         print('Please select an option from the following menu:')
         print('[N]ew game')
         print('[C]hange Player')
-        print('[P]rint statistics')
+        print('[P]layer statistics')
         print('[S]how top 10 scores')
         print('[D]elete all scores')
         print('[Q]uit')
@@ -126,11 +163,13 @@ class Menu:
         userInput = str(self.getInput('Enter your choice: ')).lower()
         if userInput == 'n':
             self.setCurrentMenu(Menu.GAME)
+        elif userInput == 'p':
+            self.setCurrentMenu(Menu.PLAYER)
         elif userInput == 'q':
             self.setCurrentMenu(Menu.QUIT)
 
     def gameMenu(self, args):
-        card1, card2, card3, card4 = args[0]
+        card1, card2, card3, card4 = args
         print('Actions:')
 
         if card1 is not None:
@@ -146,11 +185,22 @@ class Menu:
         print('[Q]uit game')
         return self.getInput('What would you like to do? ')
 
+    def playerMenu(self, args):
+        playerName, stats = args
+        self.printTitle('Player Statistics\n')
+
+        # Format the data and get it ready for printing
+        formattedStats = self.__formatTable(stats)
+
+        # Print the table
+        self.__printTable(formattedStats)
+
+        self.setCurrentMenu(self.MAIN)
+
     def changePlayerMenu(self, args):
+        # TODO: Oops! forgot to clean this up in last commit
         currentPlayer, allPlayers = args
         print('Create or change to a new player')
-
-        print()
 
     def quitMenu(self):
         answer = self.getInput('Are you sure you want to quit? [y/n] ')

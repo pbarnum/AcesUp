@@ -14,6 +14,11 @@ class AcesUp:
                 parameters = []
                 if self.menu.getCurrentMenu() == Menu.MAIN:
                     parameters = self.game.getPlayer().getName()
+                elif self.menu.getCurrentMenu() == Menu.PLAYER:
+                    parameters = (
+                        self.game.getPlayer().getName(),
+                        self.game.getPlayerStats()
+                    )
 
                 self.menu.printMenu(parameters)
 
