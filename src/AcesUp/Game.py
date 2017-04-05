@@ -65,6 +65,16 @@ class Game:
     def getPlayer(self):
         return self.__player
 
+    def getPlayerStats(self):
+        stats = self.__player.getAllStats()
+        table = []
+        for stat in stats:
+            table.append([
+                stat,
+                stats[stat]
+            ])
+        return table
+
     ##
     # Sets the current game status to running
     ##
