@@ -14,16 +14,15 @@ class AcesUp:
                 parameters = []
                 if self.menu.getCurrentMenu() == Menu.MAIN:
                     parameters = self.game.getPlayer().getName()
-                elif self.menu.getCurrentMenu() == Menu.PLAYER:
-                    parameters = (
-                        self.game.getPlayer().getName(),
-                        self.game.getPlayerStats()
-                    )
+                elif self.menu.getCurrentMenu() == Menu.STATS:
+                    parameters = self.game.getPlayerStats()
 
                 self.menu.printMenu(parameters)
 
-                if (self.menu.getCurrentMenu() == Menu.GAME):
+                if self.menu.getCurrentMenu() == Menu.GAME:
                     self.__loopGame()
+                elif self.menu.getCurrentMenu() == Menu.PLAYER:
+                    self.__changePlayer()
             except KeyboardInterrupt:
                 if self.game.isInGame():
                     self.game.finishGame()
@@ -55,3 +54,46 @@ class AcesUp:
 
         # Return to the main menu
         self.menu.setCurrentMenu(Menu.MAIN)
+
+    def __changePlayer(self):
+        players = self.game.getPlayerNames()
+        playersTable = self.__formatDataToTable(players)
+        self.menu.printTable(playersTable)
+
+        uInput = str(self.menu.getInput('Choose a player or create a new one: ', lower=False))
+
+        self.game.loadPlayer(uInput)
+
+        self.menu.setCurrentMenu(Menu.MAIN)
+
+    def __formatDataToTable(self, data):
+        count = 0
+        table = []
+        colWidth = []
+        while len(data) > 0:
+            item = data.pop()
+            row = count % 10
+
+            # Set the Player name in the row/column
+            if len(table) == row:
+                table.append([item])
+            else:
+                table[row].append(item)
+
+            # Set the max string length for this column
+            if len(table[0]) > len(colWidth):
+                colWidth.append(len(item))
+            else:
+                key = len(colWidth) - 1
+                if len(item) > colWidth[key]:
+                    colWidth[key] = len(item)
+
+            count += 1
+
+        # Fill missing columns to print right border
+        while count % 10 > 0:
+            row = count % 10
+            table[row].append('')
+            count += 1
+
+        return self.menu.getFormattedTableObj(table, colWidth)

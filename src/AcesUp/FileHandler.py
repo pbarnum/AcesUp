@@ -62,6 +62,12 @@ class FileHandler:
             values.append(value)
         return values
 
+    def listAllPlayers(self):
+        names = []
+        for player in self.__getPlayers():
+            names.append(player['name'])
+        return names
+
     def getLatestPlayerByName(self):
         return self.__file['lastPlayer']
 
@@ -70,8 +76,13 @@ class FileHandler:
 
     def savePlayer(self, player):
         self.__setPlayer(player.getAllStats())
+        self.__saveFile()
 
-        # Write to the file
+    def saveLatestPlayer(self, playerName):
+        self.__file['lastPlayer'] = playerName
+        self.__saveFile()
+
+    def __saveFile(self):
         with open(self.__fileName, 'w') as outfile:
             json.dump(json.dumps(self.__file), outfile)
 
