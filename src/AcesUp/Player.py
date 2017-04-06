@@ -7,13 +7,13 @@
 class Player:
     DEFAULT_PLAYER = 'Player 1'
 
-    def __init__(self, name):
+    def __init__(self, name, score=0, time=0, won=0, lost=0, resets=0):
         self.__name = name
-        self.__score = 0
-        self.__time = 0
-        self.__gamesWon = 0
-        self.__gamesLost = 0
-        self.__statResets = 0
+        self.__score = score
+        self.__time = time
+        self.__gamesWon = won
+        self.__gamesLost = lost
+        self.__statResets = resets
 
     def getName(self):
         return self.__name

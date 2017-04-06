@@ -128,10 +128,19 @@ class Game:
     ##
     def loadPlayer(self, playerName):
         playerInfo = self.__file.loadPlayerByName(playerName)
-        self.__player = Player(playerInfo['name'])
         if playerInfo is not None:
-            self.__player.setScore(playerInfo['score'])
-            self.__player.setTime(playerInfo['time'])
+            self.__player = Player(
+                playerInfo['name'],
+                playerInfo['score'],
+                playerInfo['time'],
+                playerInfo['gamesWon'],
+                playerInfo['gamesLost'],
+                playerInfo['statResets'],
+            )
+            self.__file.saveLatestPlayer(playerName)
+        else:
+            self.__player = Player(playerName)
+            self.__file.savePlayer(self.__player)
 
     ##
     # Returns the 10 top scores from file
@@ -152,7 +161,7 @@ class Game:
     ##
     # Returns all Players from file
     ##
-    def getAllPlayers(self):
+    def getPlayerNames(self):
         return self.__file.listAllPlayers()
 
     ##

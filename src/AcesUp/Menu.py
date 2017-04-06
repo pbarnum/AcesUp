@@ -38,8 +38,11 @@ class Menu:
         else:
             return getattr(self, self.getCurrentMenu() + 'Menu')()
 
-    def getInput(self, inputText):
-        return str(raw_input('\n' + inputText)).lower()
+    def getInput(self, inputText, **kwargs):
+        value = str(raw_input('\n' + inputText))
+        if 'lower' not in kwargs or kwargs['lower'] is True:
+            value = value.lower()
+        return value
 
     def hasMenu(self):
         return self.__currentMenu is not None
@@ -107,10 +110,7 @@ class Menu:
         print(self.__border + '\n')
 
     def __formatTable(self, table):
-        formatted = {
-            'table': table,
-            'colWidth': [0] * len(table[0])
-        }
+        formatted = self.getFormattedTableObj(table, [0] * len(table[0]))
 
         for row in range(0, len(table)):
             for col in range(0, len(table[row])):
@@ -119,7 +119,7 @@ class Menu:
 
         return formatted
 
-    def __printTable(self, table):
+    def printTable(self, table):
         # Number of columns * padding on both sides + number of dividers
         totalPadding = len(table['colWidth']) * (self.__colPadding * 2)
         sumOfColValues = sum(table['colWidth'])
@@ -139,8 +139,11 @@ class Menu:
             print(string)
             print(border)
 
-        # Print new line
-        print('')
+    def getFormattedTableObj(self, data=None, widths=None):
+        return {
+            'table': data,
+            'colWidth': widths
+        }
 
     ##
     #
@@ -163,8 +166,10 @@ class Menu:
         userInput = str(self.getInput('Enter your choice: ')).lower()
         if userInput == 'n':
             self.setCurrentMenu(Menu.GAME)
-        elif userInput == 'p':
+        elif userInput == 'c':
             self.setCurrentMenu(Menu.PLAYER)
+        elif userInput == 'p':
+            self.setCurrentMenu(Menu.STATS)
         elif userInput == 'q':
             self.setCurrentMenu(Menu.QUIT)
 
@@ -185,22 +190,17 @@ class Menu:
         print('[Q]uit game')
         return self.getInput('What would you like to do? ')
 
-    def playerMenu(self, args):
-        playerName, stats = args
+    def statsMenu(self, args):
+        stats = args
         self.printTitle('Player Statistics\n')
 
         # Format the data and get it ready for printing
         formattedStats = self.__formatTable(stats)
 
         # Print the table
-        self.__printTable(formattedStats)
+        self.printTable(formattedStats)
 
         self.setCurrentMenu(self.MAIN)
-
-    def changePlayerMenu(self, args):
-        # TODO: Oops! forgot to clean this up in last commit
-        currentPlayer, allPlayers = args
-        print('Create or change to a new player')
 
     def quitMenu(self):
         answer = self.getInput('Are you sure you want to quit? [y/n] ')
