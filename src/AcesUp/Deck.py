@@ -56,3 +56,23 @@ class Deck:
 
     def shuffle(self):
         random.shuffle(self.__cards)
+
+    def getDeckPrint(self):
+        if self.cardsRemaining() == 0:
+            return [None]
+
+        cardWidth = 5
+        printList = []
+        for card in self.__cards:
+            space = '   ' if len(str(card)) == 4 else '  '
+
+            # Remove the last printable row to look as if this card is lying on the last card
+            if len(printList) > 0:
+                printList.pop()
+
+            printList.append('+' + ('-' * cardWidth) + '+')
+            printList.append('|' + str(card) + space + '|')
+            printList.append('|' + (' ' * cardWidth) + '|')
+            printList.append('|' + space + str(card) + '|')
+        printList.append('+' + ('-' * cardWidth) + '+')
+        return printList

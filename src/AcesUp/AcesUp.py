@@ -33,7 +33,8 @@ class AcesUp:
     def __loopGame(self):
         self.game.startGame()
         while self.game.isInGame():
-            self.menu.printTitle(self.game.printCards())
+            title = 'Aces Up!\n' + self.game.getPlayer().getName() + '\n'
+            self.menu.printTitle(title + self.game.printCards())
             uInput = str(self.menu.printMenu(self.game.getCurrentFacingCards())).strip()
 
             action = uInput[:2]
