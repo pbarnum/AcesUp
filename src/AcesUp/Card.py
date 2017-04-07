@@ -36,7 +36,14 @@ class Card:
                 (other.getPosition() != 1 and (self.getPosition() == 1 or self.getPosition() > other.getPosition())))
 
     def __str__(self):
-        if self.getPosition() == 1:
-            return str(self.getSuit() + '|A')
-        zero = '0' if self.getPosition() < 10 else ''
-        return str(self.getSuit() + zero + str(self.getPosition()))
+        value = self.getPosition()
+        if value == 1:
+            value = 'A'
+        elif value == 11:
+            value = 'J'
+        elif value == 12:
+            value = 'Q'
+        elif value == 13:
+            value = 'K'
+
+        return str(str(value) + self.getSuit())

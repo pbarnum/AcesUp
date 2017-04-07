@@ -180,24 +180,30 @@ class Game:
         return cards
 
     def printCards(self):
-        gameTitle = 'Aces Up!\n' + self.getPlayer().getName() + '\n'
+        printableDecks = []
+        for deck in self.__discardPiles:
+            printableDecks.append(deck.getDeckPrint())
+
         output = ''
         found = True
-        num = 0
+        index = 0
         while found:
             found = False
             row = ''
-            for deck in self.__discardPiles:
+            for deck in printableDecks:
                 row += ' '
-                card = deck.getCardAt(num)
+                try:
+                    card = deck[index]
+                except IndexError:
+                    card = None
                 if card is not None:
                     found = True
                     row += str(card)
                 else:
-                    row += '   '
-            num += 1
+                    row += ' ' * 7
+            index += 1
             output += '\n' + row
-        return gameTitle + output
+        return output
 
     ##
     # Deals four Cards from the deck
