@@ -95,7 +95,6 @@ class AcesUp:
         if len(table) == 10:
             while count % 10 > 0:
                 row = count % 10
-                print('row' + str(row))
                 table[row].append('')
                 count += 1
 
