@@ -92,9 +92,10 @@ class AcesUp:
             count += 1
 
         # Fill missing columns to print right border
-        while count % 10 > 0:
-            row = count % 10
-            table[row].append('')
-            count += 1
+        if len(table) == 10:
+            while count % 10 > 0:
+                row = count % 10
+                table[row].append('')
+                count += 1
 
         return self.menu.getFormattedTableObj(table, colWidth)
