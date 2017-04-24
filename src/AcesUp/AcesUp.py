@@ -16,6 +16,8 @@ class AcesUp:
                     parameters = self.game.getPlayer().getName()
                 elif self.menu.getCurrentMenu() == Menu.STATS:
                     parameters = self.game.getPlayerStats()
+                elif self.menu.getCurrentMenu() == Menu.QUIT:
+                    parameters = self.game.getPlayer().getOptions()['confirmQuit']
 
                 self.menu.printMenu(parameters)
 
@@ -23,6 +25,8 @@ class AcesUp:
                     self.__loopGame()
                 elif self.menu.getCurrentMenu() == Menu.PLAYER:
                     self.__changePlayer()
+                elif self.menu.getCurrentMenu() == Menu.OPTIONS:
+                    self.__loopOptions()
             except KeyboardInterrupt:
                 if self.game.isInGame():
                     self.game.finishGame()
@@ -66,6 +70,58 @@ class AcesUp:
         self.game.loadPlayer(uInput)
 
         self.menu.setCurrentMenu(Menu.MAIN)
+
+    def __loopOptions(self):
+        playerName = self.game.getPlayer().getName()
+        options = self.game.getPlayer().getOptions()
+
+        while self.menu.getCurrentMenu() == Menu.OPTIONS:
+            self.menu.printTitle('Options: ' + playerName)
+
+            print('Enter the option name followed by the new value')
+            print('Each option will display the appropriate value range\n')
+
+            print('undo [true|false]: ' + str(options['undo']))
+            print('confirm_quit_menu [true|false]: ' + str(options['confirmQuit']))
+
+            print('\n[S]ave and quit options')
+            print('\n[Q]uit without saving options')
+
+            uInput = self.menu.getInput('Update option: ')
+            option = str(uInput).split(None, 1)[0].lower()
+            if option == 'undo':
+                try:
+                    value = str(uInput.split(None, 1)[1]).lower()
+                except ValueError:
+                    print('Undo option only accepts boolean values (true|false)')
+                    continue
+
+                if value == 't' or value == 'True':
+                    value = True
+                elif value == 'f' or value == 'false':
+                    value = False
+                else:
+                    value = options['undo']
+                self.game.getPlayer().setOptions({'undo': value})
+            elif option == 'confirm_quit_menu':
+                try:
+                    value = str(uInput.split(None, 1)[1]).lower()
+                except ValueError:
+                    print('Confirm quit menu option only accepts boolean values (true|false)')
+                    continue
+
+                if value == 't' or value == 'True':
+                    value = True
+                elif value == 'f' or value == 'false':
+                    value = False
+                else:
+                    value = options['confirmQuit']
+                self.game.getPlayer().setOptions({'confirmQuit': value})
+            elif uInput == 's':
+                self.game.savePlayer(self.game.getPlayer())
+                self.menu.setCurrentMenu(Menu.MAIN)
+            elif uInput == 'q':
+                self.menu.setCurrentMenu(Menu.MAIN)
 
     def __formatDataToTable(self, data):
         count = 0

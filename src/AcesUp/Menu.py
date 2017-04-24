@@ -11,6 +11,7 @@ class Menu:
     PLAYER = 'player'
     STATS = 'stats'
     GAME = 'game'
+    OPTIONS = 'options'
     DELETE = 'delete'
     QUIT = 'quit'
 
@@ -33,7 +34,7 @@ class Menu:
         return self.__currentMenu
 
     def printMenu(self, *args):
-        if len(args[0]) > 0:
+        if type(args[0]) == bool or len(args[0]) > 0:
             return getattr(self, self.getCurrentMenu() + 'Menu')(args[0])
         else:
             return getattr(self, self.getCurrentMenu() + 'Menu')()
@@ -160,6 +161,7 @@ class Menu:
         print('[C]hange Player')
         print('[P]layer statistics')
         print('[S]how top 10 scores')
+        print('[O]ptions')
         print('[D]elete all scores')
         print('[Q]uit')
 
@@ -170,6 +172,8 @@ class Menu:
             self.setCurrentMenu(Menu.PLAYER)
         elif userInput == 'p':
             self.setCurrentMenu(Menu.STATS)
+        elif userInput == 'o':
+            self.setCurrentMenu(Menu.OPTIONS)
         elif userInput == 'q':
             self.setCurrentMenu(Menu.QUIT)
 
@@ -190,6 +194,9 @@ class Menu:
         print('[Q]uit game')
         return self.getInput('What would you like to do? ')
 
+    def optionsMenu(self, args):
+        return
+
     def statsMenu(self, args):
         stats = args
         self.printTitle('Player Statistics\n')
@@ -202,7 +209,12 @@ class Menu:
 
         self.setCurrentMenu(self.MAIN)
 
-    def quitMenu(self):
+    def quitMenu(self, args):
+        confirm = args
+        if confirm is False:
+            self.setCurrentMenu(None)
+            return
+
         answer = self.getInput('Are you sure you want to quit? [y/n] ')
         if answer == 'n' or answer == 'no':
             self.setCurrentMenu(self.MAIN)

@@ -66,7 +66,7 @@ class Game:
         return self.__player
 
     def getPlayerStats(self):
-        stats = self.__player.getAllStats()
+        stats = self.__player.getAllStats(options=False)
         table = []
         for stat in stats:
             table.append([
@@ -136,6 +136,7 @@ class Game:
                 playerInfo['gamesWon'],
                 playerInfo['gamesLost'],
                 playerInfo['statResets'],
+                playerInfo['options'],
             )
             self.__file.saveLatestPlayer(playerName)
         else:
