@@ -1,5 +1,6 @@
 from Game import Game
 from Menu import Menu
+from copy import copy
 
 
 class AcesUp:
@@ -13,11 +14,11 @@ class AcesUp:
             try:
                 parameters = []
                 if self.menu.getCurrentMenu() == Menu.MAIN:
-                    parameters = self.game.getPlayer().getName()
+                    parameters = self.game.getPlayer().get('name')
                 elif self.menu.getCurrentMenu() == Menu.STATS:
                     parameters = self.game.getPlayerStats()
                 elif self.menu.getCurrentMenu() == Menu.QUIT:
-                    parameters = self.game.getPlayer().getOptions()['confirmQuit']
+                    parameters = self.game.getPlayer().get('options.confirmQuit')
 
                 self.menu.printMenu(parameters)
 
@@ -37,7 +38,7 @@ class AcesUp:
     def __loopGame(self):
         self.game.startGame()
         while self.game.isInGame():
-            title = 'Aces Up!\n' + self.game.getPlayer().getName() + '\n'
+            title = 'Aces Up!\n' + self.game.getPlayer().get('name') + '\n'
             self.menu.printTitle(title + self.game.printCards())
             uInput = str(self.menu.printMenu(self.game.getCurrentFacingCards())).strip()
 
@@ -51,6 +52,8 @@ class AcesUp:
 
                 # Call the proper function to handle the action
                 getattr(self.game, action + 'Card')(column - 1)
+            elif action == 'u':
+                self.game.undo()
             elif action == 'd':
                 self.game.deal()
             elif action == 'q':
@@ -72,8 +75,8 @@ class AcesUp:
         self.menu.setCurrentMenu(Menu.MAIN)
 
     def __loopOptions(self):
-        playerName = self.game.getPlayer().getName()
-        options = self.game.getPlayer().getOptions()
+        playerName = self.game.getPlayer().get('name')
+        options = self.game.getPlayer().get('options')
 
         while self.menu.getCurrentMenu() == Menu.OPTIONS:
             self.menu.printTitle('Options: ' + playerName)
@@ -85,7 +88,7 @@ class AcesUp:
             print('confirm_quit_menu [true|false]: ' + str(options['confirmQuit']))
 
             print('\n[S]ave and quit options')
-            print('\n[Q]uit without saving options')
+            print('[Q]uit without saving options')
 
             uInput = self.menu.getInput('Update option: ')
             option = str(uInput).split(None, 1)[0].lower()
@@ -96,13 +99,13 @@ class AcesUp:
                     print('Undo option only accepts boolean values (true|false)')
                     continue
 
-                if value == 't' or value == 'True':
+                if value == 't' or value == 'true':
                     value = True
                 elif value == 'f' or value == 'false':
                     value = False
                 else:
                     value = options['undo']
-                self.game.getPlayer().setOptions({'undo': value})
+                options['undo'] = value
             elif option == 'confirm_quit_menu':
                 try:
                     value = str(uInput.split(None, 1)[1]).lower()
@@ -110,14 +113,15 @@ class AcesUp:
                     print('Confirm quit menu option only accepts boolean values (true|false)')
                     continue
 
-                if value == 't' or value == 'True':
+                if value == 't' or value == 'true':
                     value = True
                 elif value == 'f' or value == 'false':
                     value = False
                 else:
                     value = options['confirmQuit']
-                self.game.getPlayer().setOptions({'confirmQuit': value})
+                options['confirmQuit'] = value
             elif uInput == 's':
+                self.game.getPlayer().set('options', options)
                 self.game.savePlayer(self.game.getPlayer())
                 self.menu.setCurrentMenu(Menu.MAIN)
             elif uInput == 'q':
