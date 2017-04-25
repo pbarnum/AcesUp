@@ -190,6 +190,7 @@ class Menu:
         if card4 is not None:
             print('[mv|rm 4] ' + str(card4))
 
+        print('[U]ndo last action')
         print('[D]eal again')
         print('[Q]uit game')
         return self.getInput('What would you like to do? ')

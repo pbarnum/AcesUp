@@ -6,6 +6,8 @@
 from Deck import Deck
 from FileHandler import FileHandler
 from Player import Player
+from Recorder import Recorder
+from copy import deepcopy
 
 
 class Game:
@@ -16,19 +18,26 @@ class Game:
     QUIT = 4
 
     def __init__(self):
+        # Initialize the file
         self.__file = FileHandler()
+        self.options = self.__file.getOptions()
 
+        # Get the last player
         playerName = self.__getLastPlayer()
-
         self.loadPlayer(playerName)
 
+        # Set the Game menu
         self.__status = self.IN_MENU
 
         # Points
         self.__modCounter = 0
         self.__modifier = 0
         self.__resetPointModifier()
+
+        # Deck
         self.__initializeDeck()
+
+        self.__recorder = Recorder(self.__player.get('options.undo'))
 
     ##
     # Builds the deck and temporary deck piles
@@ -46,6 +55,25 @@ class Game:
         deck.buildFullDeck()
         deck.shuffle()
         self.__deck = deck
+
+    def undo(self):
+        if self.__recorder.canUndo():
+            state = self.__recorder.undo()
+            if state is not None:
+                self.__applyState(state)
+
+    def __applyState(self, state):
+        self.__player.set('score', state['score'])
+        self.__deck = state['deck']
+        self.__discardPiles = state['discardPiles']
+
+    def __saveState(self):
+        state = {
+            'score': self.__player.get('score'),
+            'deck': deepcopy(self.__deck),
+            'discardPiles': deepcopy(self.__discardPiles)
+        }
+        self.__recorder.pushState(state)
 
     ##
     # Sets the current game status
@@ -80,6 +108,9 @@ class Game:
     ##
     def startGame(self):
         self.deal()
+        # First deal of the game, reset the state
+        self.__recorder.toggleUndos(self.__player.get('options.undo'))
+        self.__recorder.reset()
         self.__setGameStatus(Game.IN_GAME)
 
     def isInGame(self):
@@ -114,6 +145,7 @@ class Game:
         # TODO: mark game as failure
         # set score and increase number of lost games
         # set time
+        self.__recorder.reset()
         self.__setGameStatus(Game.QUIT)
         self.__initializeDeck()
 
@@ -129,15 +161,7 @@ class Game:
     def loadPlayer(self, playerName):
         playerInfo = self.__file.loadPlayerByName(playerName)
         if playerInfo is not None:
-            self.__player = Player(
-                playerInfo['name'],
-                playerInfo['score'],
-                playerInfo['time'],
-                playerInfo['gamesWon'],
-                playerInfo['gamesLost'],
-                playerInfo['statResets'],
-                playerInfo['options'],
-            )
+            self.__player = Player(playerInfo)
             self.__file.saveLatestPlayer(playerName)
         else:
             self.__player = Player(playerName)
@@ -211,6 +235,7 @@ class Game:
     ##
     def deal(self):
         if self.__deck.cardsRemaining() > 0:
+            self.__saveState()
             for el in range(len(self.__discardPiles)):
                 card = self.__deck.popCard()
                 self.__discardPiles[el].pushCard(card)
@@ -226,6 +251,7 @@ class Game:
     ##
     def rmCard(self, index):
         if self.__canRemoveCardFromPile(index):
+            self.__saveState()
             self.incrementModCounter()
             self.__discardPiles[index].popCard()
             self.addRemovedCardPoints()
@@ -236,6 +262,7 @@ class Game:
             if cardInQuestion is not None:
                 for pile in self.__discardPiles:
                     if pile.getFacingCard() is None:
+                        self.__saveState()
                         self.__discardPiles[index].popCard()
                         pile.pushCard(cardInQuestion)
                         return True
@@ -261,7 +288,7 @@ class Game:
         if self.__modCounter == 5:
             self.__resetModCounter()
             self.__modifier += 1
-        self.__player.addToScore((10 * self.__modifier))
+        self.__player.set('score', (10 * self.__modifier))
 
     ##
     # Adds one to the mod counter
@@ -291,4 +318,4 @@ class Game:
     # Adds a static number of points when winning the game
     ##
     def addGameWonPoints(self):
-        self.__player.addToScore(100)
+        self.__player.set('score', 100)
