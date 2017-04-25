@@ -100,3 +100,9 @@ class FileHandler:
 
     def getStatResets(self):
         return self.__getPlayerAttribute('statResets')
+
+    def getDifficulty(self):
+        return self.__getPlayerAttribute('difficulty')
+
+    def getOptions(self):
+        return self.__getPlayerAttribute('options')
