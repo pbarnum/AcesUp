@@ -2,19 +2,25 @@
 # Aces Up
 # Written by Patrick Barnum
 ##
+from copy import deepcopy
 
 
 class Player:
     DEFAULT_PLAYER = 'Player 1'
+    DIFFICULTY_EASY = 'easy'
+    DIFFICULTY_HARD = 'hard'
 
-    def __init__(self, name, score=0, time=0, won=0, lost=0, resets=0, options={}):
-        self.__name = name
-        self.__score = score
-        self.__time = time
-        self.__gamesWon = won
-        self.__gamesLost = lost
-        self.__statResets = resets
-        self.__options = self.defaultOptions() if len(options) == 0 else options
+    def __init__(self, info):
+        self.props = self.__defaultProperties()
+        # Convert string to dict
+        if (type(info) is str):
+            info = {'name': info}
+
+        # Throw error if argument is not a dict
+        if type(info) is not dict:
+            raise AttributeError
+
+        self.__setProps(info)
 
     def defaultOptions(self):
         return {
@@ -22,63 +28,76 @@ class Player:
             'confirmQuit': True
         }
 
-    def getName(self):
-        return self.__name
-
-    def getScore(self):
-        return self.__score
-
-    def getTime(self):
-        return self.__time
-
-    def getGamesWon(self):
-        return self.__gamesWon
-
-    def getGamesLost(self):
-        return self.__gamesLost
-
-    def getStatResets(self):
-        return self.__statResets
-
-    def setScore(self, score):
-        self.__score = score
-
-    def addToScore(self, score):
-        self.__score += score
-
-    def setTime(self, time):
-        self.__time = time
-
-    def addGameWon(self):
-        ++self.__gamesWon
-
-    def addGameLost(self):
-        ++self.__gamesLost
-
-    def addStatReset(self):
-        ++self.__statResets
-
-    def getAllStats(self, **excludes):
-        stats = {
-            'name': self.getName(),
-            'score': self.getScore(),
-            'time': self.getTime(),
-            'gamesWon': self.getGamesWon(),
-            'gamesLost': self.getGamesLost(),
-            'statResets': self.getStatResets(),
-            'options': self.getOptions()
+    def __defaultProperties(self):
+        return {
+            'name': '',
+            'score': 0,
+            'time': 0,
+            'gamesWon': 0,
+            'gamesLost': 0,
+            'statResets': 0,
+            'difficulty': self.DIFFICULTY_EASY,
+            'options': {
+                'undo': True,
+                'confirmQuit': True
+            }
         }
 
+    def __mergeProps(self, first, second):
+        first.update(second)
+        return first
+
+    def __setProps(self, props):
+        shell = self.__defaultProperties()
+        allProps = self.__mergeProps(shell, props)
+        for key in allProps:
+            if key in shell:
+                self.set(key, allProps[key])
+
+    ##
+    # Gets an appropriate member variable from the Player object
+    #
+    # This method will error out if the variable constructed is not found
+    ##
+    def get(self, key):
+        if key in self.__defaultProperties():
+            return deepcopy(self.props[key])
+
+        if '.' in key:
+            return self.getDeep(key)
+
+    def getDeep(self, key):
+        keys = key.split('.')
+        keys.reverse()
+        value = self.props
+
+        while len(keys) > 0:
+            value = value[keys.pop()]
+
+        return deepcopy(value)
+
+    ##
+    # Sets an appropriate member variable on the Player object
+    ##
+    def set(self, key, value):
+        if key in self.__defaultProperties():
+            if type(self.__defaultProperties()[key]) == dict:
+                self.setDictProp(key, value)
+            else:
+                self.props[key] = value
+
+    def getAllStats(self, **excludes):
+        stats = deepcopy(self.props)
         for key in excludes:
             if key in stats and excludes[key] is False:
                 del stats[key]
 
         return stats
 
-    def getOptions(self):
-        return self.__options
+    def setDictProp(self, key, obj):
+        for option in obj:
+            if option in self.props[key]:
+                self.props[key][option] = obj[option]
 
-    def setOptions(self, options):
-        for option in options:
-            if option in self.__options:
-                self.__options[option] = options[option]
+    # def getOptions(self):
+    #     return self.__options
