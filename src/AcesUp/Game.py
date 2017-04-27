@@ -3,6 +3,7 @@
 # Written by Patrick Barnum
 ##
 
+import time
 from Deck import Deck
 from FileHandler import FileHandler
 from Player import Player
@@ -29,9 +30,10 @@ class Game:
         # Set the Game menu
         self.__status = self.IN_MENU
 
+        self.resetTimer()
+
         # Points
-        self.__modCounter = 0
-        self.__modifier = 0
+        self.__resetModCounter()
         self.__resetPointModifier()
 
         # Deck
@@ -95,6 +97,10 @@ class Game:
 
     def getPlayerStats(self):
         stats = self.__player.getAllStats(options=False)
+
+        # Pretty print time
+        stats['time'] = time.strftime("%M:%S", time.gmtime(int(stats['time'])))
+
         table = []
         for stat in stats:
             table.append([
@@ -111,6 +117,10 @@ class Game:
         # First deal of the game, reset the state
         self.__recorder.toggleUndos(self.__player.get('options.undo'))
         self.__recorder.reset()
+        self.__resetModCounter()
+        self.__resetPointModifier()
+        self.resetTimer()
+        self.__startTimer()
         self.__setGameStatus(Game.IN_GAME)
 
     def isInGame(self):
@@ -132,6 +142,7 @@ class Game:
     # Sets the current game status to paused
     ##
     def pauseGame(self):
+        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
         self.__setGameStatus(Game.PAUSED)
 
     ##
@@ -139,6 +150,7 @@ class Game:
     ##
     def finishGame(self):
         self.__setGameStatus(Game.FINISHED)
+        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
         self.savePlayer(self.__player)
 
     def quitGame(self):
@@ -148,6 +160,8 @@ class Game:
         self.__recorder.reset()
         self.__setGameStatus(Game.QUIT)
         self.__initializeDeck()
+        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
+        self.savePlayer(self.__player)
 
     ##
     # Saves the active Player to file
@@ -240,6 +254,8 @@ class Game:
                 card = self.__deck.popCard()
                 self.__discardPiles[el].pushCard(card)
 
+            self.__resetModCounter()
+            self.__resetPointModifier()
             return self.getCurrentFacingCards()
 
         # no more cards left, game over
@@ -285,10 +301,11 @@ class Game:
     # Adds points to the Player's score multiplied by the mod counter
     ##
     def addRemovedCardPoints(self):
-        if self.__modCounter == 5:
+        if self.__modCounter == 2:
             self.__resetModCounter()
             self.__modifier += 1
-        self.__player.set('score', (10 * self.__modifier))
+        updated = self.__player.get('score') + (10 * self.getModifier())
+        self.__player.set('score', updated)
 
     ##
     # Adds one to the mod counter
@@ -314,8 +331,29 @@ class Game:
     def increasePointModifier(self):
         self.__modifier += 1
 
+    def getModifier(self):
+        return self.__modifier
+
     ##
     # Adds a static number of points when winning the game
     ##
     def addGameWonPoints(self):
         self.__player.set('score', 100)
+
+    def getCurrentTime(self):
+        return time.strftime("%M:%S", time.gmtime(int(time.time() - self.__startTime)))
+
+    def resetTimer(self):
+        self.__startTime = 0
+        self.__pausedTime = 0
+
+    def __startTimer(self):
+        diff = 0
+        if self.__pausedTime > 0:
+            diff = int(self.__pausedTime - self.__startTime)
+        self.__pausedTime = 0
+        self.__startTime = time.time() - diff
+
+    def __pauseTimer(self):
+        self.__pausedTime = time.time()
+        return int(self.__pausedTime - self.__startTime)

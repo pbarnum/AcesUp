@@ -1,3 +1,4 @@
+import time
 from Game import Game
 from Menu import Menu
 from copy import copy
@@ -38,7 +39,9 @@ class AcesUp:
     def __loopGame(self):
         self.game.startGame()
         while self.game.isInGame():
-            title = 'Aces Up!\n' + self.game.getPlayer().get('name') + '\n'
+            title = 'Aces Up! ' + self.game.getPlayer().get('name') + '\n' + 'Score: ' \
+                + str(self.game.getPlayer().get('score')) + ' Multiplier: ' + str(self.game.getModifier()) \
+                + '\n' + 'Time: ' + self.game.getCurrentTime()
             self.menu.printTitle(title + self.game.printCards())
             uInput = str(self.menu.printMenu(self.game.getCurrentFacingCards())).strip()
 
