@@ -12,4 +12,4 @@ You can also compile the game into a binary using the command `pyinstaller acesu
 the compiled binary program in the `./dist` directory
 
 # Bugs
-Please report any issues to https://github.com/pbarnum/acesup
+Please report any issues to https://github.com/pbarnum/AcesUp
