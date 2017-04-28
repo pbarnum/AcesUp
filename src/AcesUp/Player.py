@@ -87,6 +87,10 @@ class Player:
             else:
                 self.props[key] = value
 
+    def addTo(self, key, value):
+        original = self.get(key)
+        self.set(key, original + value)
+
     def getAllStats(self, **excludes):
         stats = deepcopy(self.props)
         for key in excludes:
