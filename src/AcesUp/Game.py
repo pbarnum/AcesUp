@@ -113,6 +113,7 @@ class Game:
     # Sets the current game status to running
     ##
     def startGame(self):
+        self.__initializeDeck()
         self.deal()
         # First deal of the game, reset the state
         self.__recorder.toggleUndos(self.__player.get('options.undo'))
@@ -142,7 +143,7 @@ class Game:
     # Sets the current game status to paused
     ##
     def pauseGame(self):
-        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
+        self.__player.addTo('time', self.__pauseTimer())
         self.__setGameStatus(Game.PAUSED)
 
     ##
@@ -150,17 +151,20 @@ class Game:
     ##
     def finishGame(self):
         self.__setGameStatus(Game.FINISHED)
-        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
+        if self.didPlayerWin():
+            self.__player.addTo('gamesWon', 1)
+        else:
+            self.__player.addTo('gamesLost', 1)
+        self.__player.addTo('time', self.__pauseTimer())
         self.savePlayer(self.__player)
 
     def quitGame(self):
         # TODO: mark game as failure
         # set score and increase number of lost games
         # set time
-        self.__recorder.reset()
         self.__setGameStatus(Game.QUIT)
-        self.__initializeDeck()
-        self.__player.set('time', int(self.__player.get('time') + self.__pauseTimer()))
+        self.__player.addTo('gamesLost', 1)
+        self.__player.addTo('time', self.__pauseTimer())
         self.savePlayer(self.__player)
 
     ##
@@ -357,3 +361,9 @@ class Game:
     def __pauseTimer(self):
         self.__pausedTime = time.time()
         return int(self.__pausedTime - self.__startTime)
+
+    def didPlayerWin(self):
+        for deck in self.__discardPiles:
+            if deck.cardsRemaining() != 1 or deck.getFacingCard().getPosition() != 1:
+                return False
+        return True

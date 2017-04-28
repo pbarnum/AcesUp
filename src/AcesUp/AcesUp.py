@@ -1,7 +1,5 @@
-import time
 from Game import Game
 from Menu import Menu
-from copy import copy
 
 
 class AcesUp:
@@ -13,22 +11,19 @@ class AcesUp:
     def main(self, argc, argv):
         while self.menu.hasMenu():
             try:
-                parameters = []
                 if self.menu.getCurrentMenu() == Menu.MAIN:
-                    parameters = self.game.getPlayer().get('name')
-                elif self.menu.getCurrentMenu() == Menu.STATS:
-                    parameters = self.game.getPlayerStats()
-                elif self.menu.getCurrentMenu() == Menu.QUIT:
-                    parameters = self.game.getPlayer().get('options.confirmQuit')
-
-                self.menu.printMenu(parameters)
-
-                if self.menu.getCurrentMenu() == Menu.GAME:
+                    self.menu.printMenu(self.game.getPlayer().get('name'))
+                elif self.menu.getCurrentMenu() == Menu.GAME:
                     self.__loopGame()
                 elif self.menu.getCurrentMenu() == Menu.PLAYER:
                     self.__changePlayer()
+                elif self.menu.getCurrentMenu() == Menu.STATS:
+                    self.menu.printMenu(self.game.getPlayerStats())
                 elif self.menu.getCurrentMenu() == Menu.OPTIONS:
                     self.__loopOptions()
+                elif self.menu.getCurrentMenu() == Menu.QUIT:
+                    self.menu.printMenu(self.game.getPlayer().get('options.confirmQuit'))
+
             except KeyboardInterrupt:
                 if self.game.isInGame():
                     self.game.finishGame()
@@ -63,8 +58,18 @@ class AcesUp:
                 self.game.quitGame()
                 self.menu.setCurrentMenu(Menu.MAIN)
 
-        # Return to the main menu
-        self.menu.setCurrentMenu(Menu.MAIN)
+        while self.game.isFinished():
+            title = 'Aces Up! ' + self.game.getPlayer().get('name') + '\n' + 'Score: ' \
+                + str(self.game.getPlayer().get('score')) + ' Multiplier: ' + str(self.game.getModifier()) \
+                + '\n' + 'Time: ' + self.game.getCurrentTime()
+            self.menu.printTitle(title + self.game.printCards())
+            print('Game over, you ' + ('won' if self.game.didPlayerWin() else 'lost') + '!')
+            uInput = self.menu.getInput('Would you like to play again? ')
+            if uInput == 'y' or uInput == 'yes':
+                break
+            elif uInput == 'n' or uInput == 'no':
+                self.game.quitGame()
+                self.menu.setCurrentMenu(Menu.MAIN)
 
     def __changePlayer(self):
         players = self.game.getPlayerNames()
