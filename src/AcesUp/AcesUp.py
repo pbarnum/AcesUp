@@ -15,12 +15,14 @@ class AcesUp:
                     self.menu.printMenu(self.game.getPlayer().get('name'))
                 elif self.menu.getCurrentMenu() == Menu.GAME:
                     self.__loopGame()
-                elif self.menu.getCurrentMenu() == Menu.PLAYER:
-                    self.__changePlayer()
                 elif self.menu.getCurrentMenu() == Menu.STATS:
                     self.menu.printMenu(self.game.getPlayerStats())
+                elif self.menu.getCurrentMenu() == Menu.RESET:
+                    self.__loopReset()
                 elif self.menu.getCurrentMenu() == Menu.OPTIONS:
                     self.__loopOptions()
+                elif self.menu.getCurrentMenu() == Menu.PLAYER:
+                    self.__changePlayer()
                 elif self.menu.getCurrentMenu() == Menu.QUIT:
                     self.menu.printMenu(self.game.getPlayer().get('options.confirmQuit'))
 
@@ -55,8 +57,7 @@ class AcesUp:
             elif action == 'd':
                 self.game.deal()
             elif action == 'q':
-                self.game.quitGame()
-                self.menu.setCurrentMenu(Menu.MAIN)
+                self.game.finishGame()
 
         while self.game.isFinished():
             title = 'Aces Up! ' + self.game.getPlayer().get('name') + '\n' + 'Score: ' \
@@ -64,11 +65,22 @@ class AcesUp:
                 + '\n' + 'Time: ' + self.game.getCurrentTime()
             self.menu.printTitle(title + self.game.printCards())
             print('Game over, you ' + ('won' if self.game.didPlayerWin() else 'lost') + '!')
-            uInput = self.menu.getInput('Would you like to play again? ')
+            uInput = self.menu.getInput('Would you like to play again? [y/n] ')
             if uInput == 'y' or uInput == 'yes':
+                self.menu.setCurrentMenu(Menu.GAME)
                 break
             elif uInput == 'n' or uInput == 'no':
                 self.game.quitGame()
+                self.menu.setCurrentMenu(Menu.MAIN)
+
+    def __loopReset(self):
+        while self.menu.getCurrentMenu() == Menu.RESET:
+            uInput = self.menu.getInput('Are you sure you want to reset your stats? [y/n] ')
+            if uInput == 'y' or uInput == 'yes':
+                self.game.getPlayer().resetStats()
+                self.game.savePlayer(self.game.getPlayer())
+                self.menu.setCurrentMenu(Menu.MAIN)
+            elif uInput == 'n' or uInput == 'no':
                 self.menu.setCurrentMenu(Menu.MAIN)
 
     def __changePlayer(self):
@@ -76,7 +88,7 @@ class AcesUp:
         playersTable = self.__formatDataToTable(players)
         self.menu.printTable(playersTable)
 
-        uInput = str(self.menu.getInput('Choose a player or create a new one: ', lower=False))
+        uInput = self.menu.getInput('Choose a player or create a new one: ', lower=False)
 
         self.game.loadPlayer(uInput)
 

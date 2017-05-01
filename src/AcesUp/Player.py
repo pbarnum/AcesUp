@@ -3,18 +3,18 @@
 # Written by Patrick Barnum
 ##
 
-from copy import deepcopy
+import copy
 
 
 class Player:
-    DEFAULT_PLAYER = 'Player 1'
+    DEFAULT_PLAYER = u'Player 1'
     DIFFICULTY_EASY = 'easy'
     DIFFICULTY_HARD = 'hard'
 
     def __init__(self, info):
         self.props = self.__defaultProperties()
         # Convert string to dict
-        if (type(info) is str):
+        if (type(info) is unicode):
             info = {'name': info}
 
         # Throw error if argument is not a dict
@@ -62,7 +62,7 @@ class Player:
     ##
     def get(self, key):
         if key in self.__defaultProperties():
-            return deepcopy(self.props[key])
+            return copy.deepcopy(self.props[key])
 
         if '.' in key:
             return self.getDeep(key)
@@ -75,7 +75,7 @@ class Player:
         while len(keys) > 0:
             value = value[keys.pop()]
 
-        return deepcopy(value)
+        return copy.deepcopy(value)
 
     ##
     # Sets an appropriate member variable on the Player object
@@ -92,7 +92,7 @@ class Player:
         self.set(key, original + value)
 
     def getAllStats(self, **excludes):
-        stats = deepcopy(self.props)
+        stats = copy.deepcopy(self.props)
         for key in excludes:
             if key in stats and excludes[key] is False:
                 del stats[key]
@@ -104,5 +104,7 @@ class Player:
             if option in self.props[key]:
                 self.props[key][option] = obj[option]
 
-    # def getOptions(self):
-    #     return self.__options
+    def resetStats(self):
+        name = copy.copy(self.props['name'])
+        self.props = copy.deepcopy(self.__defaultProperties())
+        self.props['name'] = name
