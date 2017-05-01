@@ -113,6 +113,7 @@ class Game:
     # Sets the current game status to running
     ##
     def startGame(self):
+        self.__setGameStatus(Game.IN_GAME)
         self.__initializeDeck()
         self.deal()
         # First deal of the game, reset the state
@@ -122,7 +123,6 @@ class Game:
         self.__resetPointModifier()
         self.resetTimer()
         self.__startTimer()
-        self.__setGameStatus(Game.IN_GAME)
 
     def isInGame(self):
         return self.getGameStatus() == Game.IN_GAME
@@ -159,12 +159,7 @@ class Game:
         self.savePlayer(self.__player)
 
     def quitGame(self):
-        # TODO: mark game as failure
-        # set score and increase number of lost games
-        # set time
         self.__setGameStatus(Game.QUIT)
-        self.__player.addTo('gamesLost', 1)
-        self.__player.addTo('time', self.__pauseTimer())
         self.savePlayer(self.__player)
 
     ##

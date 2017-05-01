@@ -8,10 +8,11 @@ from version import __version__
 
 class Menu:
     MAIN = 'main'
-    PLAYER = 'player'
-    STATS = 'stats'
     GAME = 'game'
+    STATS = 'stats'
     OPTIONS = 'options'
+    PLAYER = 'player'
+    RESET = 'reset'
     DELETE = 'delete'
     QUIT = 'quit'
 
@@ -40,7 +41,7 @@ class Menu:
             return getattr(self, self.getCurrentMenu() + 'Menu')()
 
     def getInput(self, inputText, **kwargs):
-        value = str(raw_input('\n' + inputText))
+        value = raw_input('\n' + inputText).decode('utf-8')
         if 'lower' not in kwargs or kwargs['lower'] is True:
             value = value.lower()
         return value
@@ -105,6 +106,8 @@ class Menu:
         else:
             titles = self.__formatTitle(title)
 
+        print(titles)
+
         print(self.__border)
         for string in titles:
             print('|' + self.__addPadding(string) + '|')
@@ -158,24 +161,28 @@ class Menu:
 
         print('Please select an option from the following menu:')
         print('[N]ew game')
-        print('[C]hange Player')
-        print('[P]layer statistics')
-        print('[S]how top 10 scores')
+        print('[S]tatistics')
+        print('[R]eset statistics')
         print('[O]ptions')
-        print('[D]elete all scores')
+        print('[C]hange Player')
+        print('[T]op 10 scores')
         print('[Q]uit')
 
-        userInput = str(self.getInput('Enter your choice: ')).lower()
+        userInput = self.getInput('Enter your choice: ')
         if userInput == 'n':
-            self.setCurrentMenu(Menu.GAME)
-        elif userInput == 'c':
-            self.setCurrentMenu(Menu.PLAYER)
-        elif userInput == 'p':
-            self.setCurrentMenu(Menu.STATS)
+            self.setCurrentMenu(self.GAME)
+        elif userInput == 's':
+            self.setCurrentMenu(self.STATS)
+        elif userInput == 'r':
+            self.setCurrentMenu(self.RESET)
         elif userInput == 'o':
-            self.setCurrentMenu(Menu.OPTIONS)
+            self.setCurrentMenu(self.OPTIONS)
+        elif userInput == 'c':
+            self.setCurrentMenu(self.PLAYER)
+        # elif userInput == 't':
+        #     self.setCurrentMenu(self.TOP)
         elif userInput == 'q':
-            self.setCurrentMenu(Menu.QUIT)
+            self.setCurrentMenu(self.QUIT)
 
     def gameMenu(self, args):
         card1, card2, card3, card4 = args

@@ -1,5 +1,6 @@
 ##
-#
+# Aces Up
+# Written by Patrick Barnum
 ##
 
 from enum import Enum
