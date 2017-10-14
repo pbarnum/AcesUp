@@ -2,9 +2,8 @@
 
 block_cipher = None
 
-
 a = Analysis(['acesup'],
-             pathex=['/home/p-trick/Projects/acesup'],
+             pathex=['./acesup'],
              binaries=[],
              datas=[],
              hiddenimports=["enum", "json"],
