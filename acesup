@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 import sys
+from importlib import reload
 reload(sys)
-sys.setdefaultencoding("utf-8")
 sys.path.append('./src/AcesUp')
 from AcesUp import AcesUp
 

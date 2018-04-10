@@ -64,7 +64,7 @@ class Deck:
         cardWidth = 5
         printList = []
         for card in self.__cards:
-            space = '   ' if len(str(card)) == 4 else '  '
+            space = '   ' if len(str(card)) == 2 else '  '
 
             # Remove the last printable row to look as if this card is lying on the last card
             if len(printList) > 0:

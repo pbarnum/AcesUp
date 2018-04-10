@@ -14,7 +14,7 @@ class Player:
     def __init__(self, info):
         self.props = self.__defaultProperties()
         # Convert string to dict
-        if (type(info) is unicode):
+        if (type(info) is str):
             info = {'name': info}
 
         # Throw error if argument is not a dict
