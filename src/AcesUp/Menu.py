@@ -41,7 +41,7 @@ class Menu:
             return getattr(self, self.getCurrentMenu() + 'Menu')()
 
     def getInput(self, inputText, **kwargs):
-        value = raw_input('\n' + inputText).decode('utf-8')
+        value = input('\n' + inputText)
         if 'lower' not in kwargs or kwargs['lower'] is True:
             value = value.lower()
         return value
@@ -105,8 +105,6 @@ class Menu:
             titles = title.splitlines()
         else:
             titles = self.__formatTitle(title)
-
-        print(titles)
 
         print(self.__border)
         for string in titles:
