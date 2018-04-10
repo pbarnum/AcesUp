@@ -1,0 +1,9 @@
+version: '3'
+services:
+  acesup:
+    container_name: acesup
+    image: acesup_img
+    build: .
+    volumes:
+      - ./:/acesup
+    tty: true
